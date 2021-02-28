@@ -12,6 +12,7 @@
 #include "debug.h"
 #include "parse.h"
 #include "Stepper.h"
+#include "keyboard.h"
 
 void timer_init(void)
 {
@@ -24,11 +25,9 @@ void timer_init(void)
 void port_init(void)
 {
   DDRB = (1 << Led_builtin) | _BV(debugPin1); // Led builtin (13)
-  //DDRC = (1 << debugPin0) | (1 << debugPin1) | (1 << debugPin2) | _BV(Buzzer);
-  DDRD = ( 1 << LED_STATUS | 0 << BUTTON_PLAY | 0 << BUTTON_FF | 0 << BUTTON_REV);
-  PORTD = (1<<BUTTON_PLAY | 1<<BUTTON_FF | 1<<BUTTON_REV);
+  //DDRC = (1 << debugPin0) | (1 << debugPin1) | (1 << debugPin2) | _BV(Keys);
+  DDRD = (1 << LED_STATUS);
 }
-
 
 ISR(TIMER2_COMPA_vect) // TIMER2 interrupt
 {
@@ -41,6 +40,7 @@ int main()
 {
   timer_init();
   port_init();
+  keyboardInit();
   uart_init();
   stepperInit();
   sei();
@@ -48,10 +48,14 @@ int main()
   interval1 = eeprom_read_dword(saved_interval1);
   interval2 = eeprom_read_dword(saved_interval2);
   interval3 = eeprom_read_dword(saved_interval3);
-  intervalBuzzer = eeprom_read_dword(saved_intervalBuzzer);
+  intervalKeys = eeprom_read_dword(saved_intervalKeys);
   testVar1 = eeprom_read_dword(saved_testVar1);
   char uartInputString[64] = "\0";
   char cmdLine[64] = "\0";
+  uint8_t prevKeysState = 0;
+  uint8_t keyHoldCounter = 0;
+  uint32_t clkMove4X = 0;
+  uint32_t clkMove8X = 0;
 
   while (1)
   {
@@ -65,30 +69,109 @@ int main()
     {
       clk1 = mainClock_us_temp;
       PORTB ^= 1 << Led_builtin;
-
-
     }
     if ((mainClock_us_temp - clk2) >= interval2)
     {
       clk2 = mainClock_us_temp;
-      
-      stepHalfUp();
-      
+
+      if ((workMode & (1 << MOVE_FOLLOW_STARS)) && !(workMode & (0b01111110)))
+      {
+        if (workMode & (1 << MOVE_DIRECTION))
+        {
+          stepHalfUp();
+        }
+        else
+        {
+          stepHalfDown();
+        }
+      }
     }
 
     if ((mainClock_us_temp - clk3) >= interval3)
     {
       clk3 = mainClock_us_temp;
-      PORTD ^= 1 << LED_STATUS;
-
+      if (workMode & (1 << MOVE_FORWARD_MAX))
+      {
+        if (workMode & (1 << MOVE_DIRECTION))
+        {
+          stepHalfUp();
+        }
+        else
+        {
+          stepHalfDown();
+        }
+      }
+      if (workMode & (1 << MOVE_REVERSE_MAX))
+      {
+        if (workMode & (1 << MOVE_DIRECTION))
+        {
+          stepHalfDown();
+        }
+        else
+        {
+          stepHalfUp();
+        }
+      }
     }
-    
-    
 
-    if ((mainClock_us_temp - clkBuzzer) >= intervalBuzzer)
+    if ((mainClock_us_temp - clkMove8X) >= interval3 * 2)
     {
-      clkBuzzer = mainClock_us_temp;
-      // PORTC ^= _BV(Buzzer);
+      clkMove8X = mainClock_us_temp;
+      if (workMode & (1 << MOVE_FORWARD_8X))
+      {
+        if (workMode & (1 << MOVE_DIRECTION))
+        {
+          stepHalfUp();
+        }
+        else
+        {
+          stepHalfDown();
+        }
+      }
+      if (workMode & (1 << MOVE_REVERSE_8X))
+      {
+        if (workMode & (1 << MOVE_DIRECTION))
+        {
+          stepHalfDown();
+        }
+        else
+        {
+          stepHalfUp();
+        }
+      }
+    }
+
+    if ((mainClock_us_temp - clkMove4X) >= interval3 * 4)
+    {
+      clkMove4X = mainClock_us_temp;
+      if (workMode & (1 << MOVE_FORWARD_4X))
+      {
+        if (workMode & (1 << MOVE_DIRECTION))
+        {
+          stepHalfUp();
+        }
+        else
+        {
+          stepHalfDown();
+        }
+      }
+      if (workMode & (1 << MOVE_REVERSE_4X))
+      {
+        if (workMode & (1 << MOVE_DIRECTION))
+        {
+          stepHalfDown();
+        }
+        else
+        {
+          stepHalfUp();
+        }
+      }
+    }
+
+    if ((mainClock_us_temp - clkKeys) >= intervalKeys)
+    {
+      clkKeys = mainClock_us_temp;
+      prevKeysState = readKeys(prevKeysState, keyHoldCounter);
     }
 
     if (uartEcho())
@@ -101,18 +184,5 @@ int main()
         parseCmdline(cmdLine);
       }
     }
-
-    //    uartReceive(uartInputString, uartInputBuffer);
-    // uartReceive(uartBuffer.data, uartInputBuffer);
-
-    //    _delay_us(5);
-    //    PORTC |= _BV(debugPin0);
-    //    PORTC &= ~_BV(debugPin0);
-    //    PORTC |= _BV(debugPin2);
-
-    //    PORTC &= ~_BV(debugPin2);
-    //      for (uint8_t i = 0; i < 50; ++i) //DEBUG ONLY !!!!!
-    //        asm("nop");
-    //uartTransmitString((char *)"LED_builtin toggle\n");//DEBUG ONLY!!!
   }
 }

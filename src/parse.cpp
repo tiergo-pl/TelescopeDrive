@@ -39,14 +39,21 @@ void parseCmdline(char *cmdLine)
       eeprom_update_dword(saved_interval1, interval1);
       eeprom_update_dword(saved_interval2, interval2);
       eeprom_update_dword(saved_interval3, interval3);
-      eeprom_update_dword(saved_intervalBuzzer, intervalBuzzer);
+      eeprom_update_dword(saved_intervalKeys, intervalKeys);
       eeprom_update_dword(saved_testVar1, testVar1);
       uartTransmitString((char *)"...Saved\r\n");
     }
     else if (!strcmp(cmd, CMD_SHOW))
     {
-      sprintf(uartOutputString, "mainClk= %lu, cmdLine: [%s], interval1= %lu, interval2= %lu, interval3= %lu, intervalBuzzer= %lu , testVar1= %lu\r\n", mainClock_us_temp, cmd, interval1, interval2, interval3, intervalBuzzer, testVar1);
+      sprintf(uartOutputString, "mainClk= %lu, cmdLine: [%s], interval1= %lu, interval2= %lu, interval3= %lu\r\n", mainClock_us_temp, cmd, interval1, interval2, interval3);
       uartTransmitString(uartOutputString);
+      while (uartTXBuf.isNotEmpty())
+      {
+        _delay_us (100);
+      }
+      sprintf(uartOutputString, "intervalKeys= %lu , testVar1= %lu\r\n", intervalKeys, testVar1);
+      uartTransmitString(uartOutputString);
+      
     }
     else if (!strcmp(cmd, CMD_HELP))
     {
@@ -94,11 +101,11 @@ void parseCmdline(char *cmdLine)
       else
         uartTransmitString((char *)"Input valid number of microseconds. Nothing changed yet...\r\n");
     }
-    else if (!strcmp(cmd, CMD_freqBuzzer))
+    else if (!strcmp(cmd, CMD_freqKeys))
     {
       if (value)
       {
-        intervalBuzzer = 50000 / value;
+        intervalKeys = 100000 / value;
       }
       else
         uartTransmitString((char *)"Input valid frequency in Hz. Nothing changed yet...\r\n");
