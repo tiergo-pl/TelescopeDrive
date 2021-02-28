@@ -51,52 +51,21 @@ void parseCmdline(char *cmdLine)
     else if (!strcmp(cmd, CMD_HELP))
     {
       uartTransmitString((char *)"Usage: [COMMAND] ... [VARIABLE=VALUE] ... \r\nexample: i2=100000 freq=1000 save show ?\r\n");
-      for (size_t i = 0; i < testVar1; i++)
+      while (uartTXBuf.isNotEmpty())
       {
-        if (uartTXBuf.isNotEmpty())
-        {
-          PORTB |= _BV(debugPin1);
-          PORTB &= ~_BV(debugPin1);
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          PORTB |= _BV(debugPin1);
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          PORTB &= ~_BV(debugPin1);
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          PORTB |= _BV(debugPin1);
-          PORTB &= ~_BV(debugPin1);
-        }
-        if (uartTXBuf.isEmpty())
-        {
-          PORTB |= _BV(debugPin1);
-          asm("nop");
-          asm("nop");
-          PORTB &= ~_BV(debugPin1);
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          asm("nop");
-          PORTB |= _BV(debugPin1);
-          PORTB &= ~_BV(debugPin1);
-        }
+        _delay_us (100);
       }
 
       uartTransmitString((char *)"Commands:\r\ni[n]=[t]\t set intervals n=1..3 to time tx10 microseconds\r\n");
+      uartTransmitString((char *)"t[n]=[t]\t set test variables n=1..1\r\n");
+      while (uartTXBuf.isNotEmpty())
+      {
+        _delay_us (100);
+      }
+
       uartTransmitString((char *)"save\tsave parameters to eeprom\r\nshow\t show active parameters\r\n");
+      uartTransmitString((char *)"rand=x\tget random number from range\r\n");
+
     }
     else if (!strcmp(cmd, CMD_interval1))
     {
