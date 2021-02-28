@@ -16,6 +16,7 @@
 #define CMD_interval3 "i3"
 #define CMD_freqBuzzer "freq"
 #define CMD_random "rand"
+#define CMD_testVar1 "t1"
 
 //---------------------
 

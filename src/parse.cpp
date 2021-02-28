@@ -144,6 +144,10 @@ void parseCmdline(char *cmdLine)
       sprintf(uartOutputString, "Random number is: %i \r\n", val_rand);
       uartTransmitString(uartOutputString);
     }
+    else if (!strcmp(cmd, CMD_testVar1))
+    {
+      testVar1 = value;
+    }
 
     else
       uartTransmitString((char *)"Wrong command or nothing entered\r\n");
