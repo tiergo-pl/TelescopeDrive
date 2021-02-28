@@ -20,5 +20,8 @@ void uartTransmitBinary(char *buffer, uint8_t lenght);
 void uartTransmitString(char *buffer);
 uint8_t uartReceiveString(char *rxString);
 uint8_t uartEcho();
+extern circBuffer uartRXBuf;
+extern circBuffer uartTXBuf;
+
 
 #endif

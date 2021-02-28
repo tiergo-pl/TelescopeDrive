@@ -21,6 +21,12 @@ extern volatile uint32_t interval3;                        //use variable for mu
 extern uint32_t *saved_interval3; //and pointer to its saved value
 extern volatile uint32_t intervalBuzzer; // buzzer tone generation
 extern uint32_t *saved_intervalBuzzer;
+
+extern volatile int32_t testVar1; // buzzer tone generation
+extern uint32_t *saved_testVar1;
+
+
+
 //-----------------------
 // used gpio pins
 #define Led_builtin PB5

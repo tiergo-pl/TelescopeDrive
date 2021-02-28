@@ -23,7 +23,7 @@ void timer_init(void)
 
 void port_init(void)
 {
-  DDRB = (1 << Led_builtin) | _BV(debugPin3); // Led builtin (13)
+  DDRB = (1 << Led_builtin) | _BV(debugPin1); // Led builtin (13)
   //DDRC = (1 << debugPin0) | (1 << debugPin1) | (1 << debugPin2) | _BV(Buzzer);
   DDRD = ( 1 << LED_STATUS | 0 << BUTTON_PLAY | 0 << BUTTON_FF | 0 << BUTTON_REV);
   PORTD = (1<<BUTTON_PLAY | 1<<BUTTON_FF | 1<<BUTTON_REV);
@@ -49,6 +49,7 @@ int main()
   interval2 = eeprom_read_dword(saved_interval2);
   interval3 = eeprom_read_dword(saved_interval3);
   intervalBuzzer = eeprom_read_dword(saved_intervalBuzzer);
+  testVar1 = eeprom_read_dword(saved_testVar1);
   char uartInputString[64] = "\0";
   char cmdLine[64] = "\0";
 

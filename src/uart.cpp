@@ -1,7 +1,7 @@
 #include "uart.h"
 
-circBuffer uartRXBuf(128, 128 - 5);
-circBuffer uartTXBuf(128, 0);
+circBuffer uartRXBuf(255, 255 - 5);
+circBuffer uartTXBuf(255, 0);
 
 ISR(USART_RX_vect)
 {

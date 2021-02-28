@@ -16,3 +16,6 @@ volatile uint32_t clkBuzzer;
 volatile uint32_t intervalBuzzer;
 uint32_t *saved_intervalBuzzer = (uint32_t *)12;
 
+volatile int32_t testVar1;
+uint32_t *saved_testVar1 = (uint32_t *)16;
+
