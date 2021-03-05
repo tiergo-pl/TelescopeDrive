@@ -19,6 +19,6 @@ uint32_t *saved_intervalKeys = (uint32_t *)12;
 volatile int32_t testVar1;
 uint32_t *saved_testVar1 = (uint32_t *)16;
 
-volatile uint8_t workMode = 0;
+volatile uint8_t workMode = (1<<MOVE_DIRECTION);
 
 
